@@ -18,7 +18,10 @@ class Ring(object):
         return hash(max(this))
 
     def __eq__(self, other):
-        return hash(self) == hash(other)
+        try:
+            return hash(self) == hash(other)
+        finally:
+            return False
 
     def __hash__(self):
         return self._hash_
