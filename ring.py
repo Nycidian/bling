@@ -8,13 +8,6 @@ import itertools
 class Ring(object):
 
     def __init__(self, *items):
-        """
-        Creates an Orthorhombic Primitive Lattice
-        :param steps: a int value >= 0 which is equal to the number of rows, planes and columns
-            including the zero of each and in the positive and negative directions.
-        :param default_point: the value or object placed in each point when created, defaults to None
-        :param point_functions: An optional function that can be called on each point
-        """
         self._items = tuple(items)
 
         self._hash_ = self._make_hash_()
