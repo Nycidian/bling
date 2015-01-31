@@ -56,6 +56,26 @@ class TestRingBase(unittest.TestCase):
         # TODO add test for __eq__
         pass
 
+    def test_contains(self):
+
+        def func():
+            a = 1
+        def notfunc():
+            b = 2
+
+        ring = Ring(1, 3, 2)
+        ring2 = Ring('1', 3, func)
+        ring3 = Ring(2, (2, func))
+
+        self.assertTrue(1 in ring)
+        self.assertTrue('1' in ring2)
+        self.assertTrue([(2, func)] in ring3)
+
+        for r in [ring, ring2, ring3]:
+            for t in ['s', notfunc, 4]:
+                self.assertFalse(t in r, str(t) +' is in ' +str(r))
+
 
 if __name__ == '__main__':
+
     unittest.main()

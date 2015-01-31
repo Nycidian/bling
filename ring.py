@@ -5,16 +5,22 @@ class Ring(object):
 
     def __init__(self, *items):
         self._items = tuple(items)
+        self._versions_ = []
 
         self._hash_ = self._make_hash_()
 
     def _make_hash_(self):
         this = []
         for i in range(len(self._items)):
-                string = ''
-                for n in range(len(self._items)):
-                    string += str(hash(self._items[((n - i) % len(self._items))]))
-                this.append(string)
+            items = []
+            string = ''
+            for n in range(len(self._items)):
+                item = self._items[((n - i) % len(self._items))]
+                items.append(item)
+                string += str(hash(item))
+            this.append(string)
+            self._versions_.append(items)
+
         return hash(max(this))
 
     def __eq__(self, other):
@@ -54,6 +60,13 @@ class Ring(object):
         pass
 
     def __iter__(self):
+
+        for item in list(self._items):
+            yield item
+
+        raise StopIteration
+
+    def cycle(self):
         items = list(self._items)
         if len(self) > 1:
             items += items[:-1]
@@ -63,27 +76,63 @@ class Ring(object):
 
         raise StopIteration
 
-    def __contains__(self, item):
+    def versions(self):
+
+        for item in self._versions_:
+            yield item
+
+        raise StopIteration
+
+    def __contains__(self, check):
         # TODO add function that checks if a single object is in or if a tuple of objects is contained within in order
-        if isinstance(item, basestring) or isinstance(item, int):
-            print('str or int')
-        elif isinstance(item, Ring):
-            print('Ring')
-        else:
-            try:
-                print('list & tuples')
-            except:
-                raise TypeError
+        if isinstance(check, basestring) or isinstance(check, int) or callable(check):
+            for item in self:
+                if check == item:
+                    return True
 
+        try:
+            # see if item being checked can even fit in ring
+            self_len, check_len = len(self), len(check)
+            if check_len > self_len:
+                return False
 
+            def check_multiple(in_list, in_len, r, r_len):
+                # checks tuples and lists
+                try:
+                    for i in range(r_len):
+                        truth = True
+                        for n in range(in_len):
+                            truth = truth and (r[n+i] == in_list[n])
+                        if truth:
+                            return True
+                # should catch dictionaries types
+                #   except those that have numeric keys, start with 0 and are in order
+                except KeyError:
+                    return False
+
+            if isinstance(check, Ring):
+                for lst in check.versions():
+                    _return_ = check_multiple(lst, check_len, self, self_len)
+                    if _return_ is not None:
+                        return _return_
+            else:
+                _return_ = check_multiple(check, check_len, self, self_len)
+                if _return_ is not None:
+                    return _return_
+
+        except TypeError:
+            return False
 
 if __name__ == '__main__':
-    ring = Ring('a', 3)
+
     a = 1
     b = []
 
-    #print(b in ring)
+    def func():
+        a=1
 
-    for i in ring:
-        print(i)
+    ring = [(2, func), 'a']
+    ring2 = Ring((2, func), 1, 'a', func, 4)
+
+    print(ring in ring2)
 
