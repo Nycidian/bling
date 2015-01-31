@@ -1,6 +1,29 @@
 __author__ = 'Nycidian'
 
 
+class Setting(object):
+
+    def __init__(self, *items):
+        self._items = tuple(items)
+
+    @staticmethod
+    def __bool__():
+        return True
+
+    def __nonzero__(self):      # Python 2 compatibility
+        return type(self).__bool__(self)
+
+    def __hash__(self):
+        return hash(self._items)
+
+    def __eq__(self, other):
+        truth = False
+        for item in self._items:
+            truth = truth or (item == other)
+
+        return truth
+
+
 class Ring(object):
 
     def __init__(self, *items):
@@ -134,5 +157,8 @@ if __name__ == '__main__':
     ring = [(2, func), 'a']
     ring2 = Ring((2, func), 1, 'a', func, 4)
 
-    print(ring in ring2)
+    set = Setting(1, 'a', 5)
+
+
+    print(set == 5)
 

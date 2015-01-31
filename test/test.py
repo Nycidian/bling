@@ -69,7 +69,7 @@ class TestRingBase(unittest.TestCase):
 
         self.assertTrue(1 in ring)
         self.assertTrue('1' in ring2)
-        self.assertTrue([(2, func)] in ring3)
+        self.assertTrue(((2, func),) in ring3)
 
         for r in [ring, ring2, ring3]:
             for t in ['s', notfunc, 4]:
