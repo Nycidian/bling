@@ -1,10 +1,5 @@
 __author__ = 'Nycidian'
 
-import math
-import inspect
-import itertools
-
-
 class Ring(object):
 
     def __init__(self, *items):
