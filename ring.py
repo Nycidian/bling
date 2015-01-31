@@ -19,7 +19,6 @@ class Ring(object):
                 for n in range(len(self._items)):
                     string += str(hash(self._items[((n - i) % len(self._items))]))
                 this.append(string)
-        print(max(this))
         return hash(max(this))
 
     def __eq__(self, other):
