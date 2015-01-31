@@ -20,7 +20,7 @@ class Ring(object):
     def __eq__(self, other):
         try:
             return hash(self) == hash(other)
-        finally:
+        except TypeError:
             return False
 
     def __hash__(self):
@@ -59,11 +59,22 @@ class Ring(object):
 
     def __contains__(self, item):
         # TODO add function that checks if a single object is in or if a tuple of objects is contained within in order
-        pass
+        if isinstance(item, basestring) or isinstance(item, int):
+            print('str or int')
+        elif isinstance(item, Ring):
+            print('Ring')
+        else:
+            try:
+                print('list & tuples')
+            except:
+                raise TypeError
+
 
 
 if __name__ == '__main__':
     ring = Ring(1, 3, 2)
     a = 1
-    print(isinstance(ring, Ring))
+    b = []
+
+    print(b in ring)
 
