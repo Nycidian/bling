@@ -54,8 +54,14 @@ class Ring(object):
         pass
 
     def __iter__(self):
-        # TODO Add indefinite cyclical iteration
-        pass
+        items = list(self._items)
+        if len(self) > 1:
+            items += items[:-1]
+
+        for item in items:
+            yield item
+
+        raise StopIteration
 
     def __contains__(self, item):
         # TODO add function that checks if a single object is in or if a tuple of objects is contained within in order
@@ -72,9 +78,12 @@ class Ring(object):
 
 
 if __name__ == '__main__':
-    ring = Ring(1, 3, 2)
+    ring = Ring('a', 3)
     a = 1
     b = []
 
-    print(b in ring)
+    #print(b in ring)
+
+    for i in ring:
+        print(i)
 
