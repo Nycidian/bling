@@ -2,6 +2,9 @@ __author__ = 'Nycidian'
 
 
 class Setting(object):
+    """
+    Container that evaluates to true if any one of the contents is equal to what it's tested against
+    """
 
     def __init__(self, *items):
         self._items = tuple(items)
@@ -108,7 +111,7 @@ class Ring(object):
 
     def __contains__(self, check):
         # TODO add function that checks if a single object is in or if a tuple of objects is contained within in order
-        if isinstance(check, basestring) or isinstance(check, int) or callable(check):
+        if isinstance(check, basestring) or isinstance(check, int) or callable(check) or isinstance(check, Setting):
             for item in self:
                 if check == item:
                     return True
@@ -154,11 +157,12 @@ if __name__ == '__main__':
     def func():
         a=1
 
-    ring = [(2, func), 'a']
-    ring2 = Ring((2, func), 1, 'a', func, 4)
+    set = Setting('o', 'p')
+    ring = [set, 'a', set]
+    ring2 = Ring('o', 'o', 'a', 'p', 'n')
 
-    set = Setting(1, 'a', 5)
 
 
-    print(set == 5)
+
+    print(set in ring2)
 
