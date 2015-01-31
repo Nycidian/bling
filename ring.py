@@ -1,5 +1,6 @@
 __author__ = 'Nycidian'
 
+
 class Ring(object):
 
     def __init__(self, *items):
@@ -57,5 +58,9 @@ class Ring(object):
         # TODO add function that checks if a single object is in or if a tuple of objects is contained within in order
         pass
 
+
 if __name__ == '__main__':
-    pass
+    ring = Ring(1, 3, 2)
+    a = 1
+    print(isinstance(ring, Ring))
+

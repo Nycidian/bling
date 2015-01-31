@@ -35,6 +35,23 @@ class TestRingBase(unittest.TestCase):
         s = set([ring, ring2, ring3])
         self.assertEqual(len(s), 2)
 
+    def test_isinstance(self):
+
+        def func():
+            a = 2
+
+        ring = Ring(1, 3, 2)
+        ring2 = Ring('1', 3, func)
+        ring3 = Ring(2, (2, func))
+
+        self.assertTrue(isinstance(ring, Ring))
+        self.assertTrue(isinstance(ring2, Ring))
+        self.assertTrue(isinstance(ring3, Ring))
+
+        for r in [ring, ring2, ring3]:
+            for t in [int, str, list, tuple, dict]:
+                self.assertFalse(isinstance(r, t))
+
 
 if __name__ == '__main__':
     unittest.main()
