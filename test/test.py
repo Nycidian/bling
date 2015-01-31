@@ -52,6 +52,10 @@ class TestRingBase(unittest.TestCase):
             for t in [int, str, list, tuple, dict]:
                 self.assertFalse(isinstance(r, t))
 
+    def test_equals(self):
+        # TODO add test for __eq__
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()
