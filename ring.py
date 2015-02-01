@@ -1,5 +1,11 @@
 __author__ = 'Nycidian'
 
+# basestring for python 3
+try:
+  basestring
+except NameError:
+  basestring = str
+
 
 class Setting(object):
     """
