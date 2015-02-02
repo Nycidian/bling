@@ -2,9 +2,9 @@ __author__ = 'Nycidian'
 
 # basestring for python 3
 try:
-  basestring
+    basestring
 except NameError:
-  basestring = str
+    basestring = str
 
 
 class Setting(object):
@@ -33,27 +33,99 @@ class Setting(object):
         return truth
 
 
-class Band(object):
+class Cast(object):
 
     def __init__(self, *items):
         self._items = tuple(items)
+
+    def __eq__(self, other):
+        try:
+            return hash(self) == hash(other)
+        except TypeError:
+            return False
+
+    def __hash__(self):
+        this = []
+        for i in range(len(self._items)):
+            string = self.__class__.__name__
+            for n in range(len(self._items)):
+                string += str(hash(self._items[n - i]))
+            this.append(string)
+        return hash(max(this))
+
+    def __getitem__(self, key):
+        """
+        Modular Retrieval
+        """
+
+        return self._items[(key % len(self))]
+
+    def __str__(self):
+        return str(self._items)
+
+    def __repr__(self):
+        return str(self._items)
+
+    def __len__(self):
+        return len(self._items)
+
+
+class Band(object):
+
+    def __init__(self, *items):
+        self.entry = tuple(items)
+        self.extrapolated = [tuple(items)]
+        self._extrapolate_()
         self._versions_ = self._get_versions_()
         self._hash_ = self._make_hash_()
 
+    def _extrapolate_(self):
+
+        def banded():
+            if len(self.extrapolated) == 0:
+                return False
+            bands = 0
+            for item in self.extrapolated:
+                for i in item:
+                    if isinstance(i, Band):
+                        bands += 1
+            if bands > 0:
+                return True
+            return False
+
+        while banded():
+            extraps = []
+            for line in self.extrapolated:
+
+                for i in range(len(line)):
+                    if isinstance(line[i], Band):
+                        for version in line[i].versions():
+                            extraps.append(tuple(list(line[:i])+list(version)+list(line[i+1:])))
+            self.extrapolated = tuple(extraps)
+
+        s = set()
+        if self.__class__.__name__ == 'Ring':
+            print('Ring Class')
+            for item in self.extrapolated:
+                s.add(Cast(*item))
+        else:
+            print('Other Class')
+            for item in self.extrapolated:
+                s.add(item)
+        self.extrapolated = list(s)
+        print(self.extrapolated)
+
+
     def _get_versions_(self):
-        return [self._items]
+        return self.extrapolated
 
     def _make_hash_(self):
 
         this = []
-        for i in range(len(self._items)):
+        for version in self._versions_:
+            this.append(hash(version))
 
-            string = self.__class__.__name__
-            for n in range(len(self._items)):
-                string += str(hash(self[((n - i) % len(self))]))
-            this.append(string)
-
-        return hash(self.__class__.__name__ + max(this))
+        return hash(self.__class__.__name__ + str(max(this)))
 
     def __hash__(self):
         return self._hash_
@@ -65,10 +137,10 @@ class Band(object):
             return False
 
     def __str__(self):
-        return str(self._items)
+        return str(self.entry)
 
     def __repr__(self):
-        return str(self._items)
+        return str(self.entry)
 
     @staticmethod
     def __bool__():
@@ -78,13 +150,14 @@ class Band(object):
         return type(self).__bool__(self)
 
     def __len__(self):
-        return len(self._items)
+        return len(self._versions_[0])
 
     def __getitem__(self, key):
         """
         Modular Retrieval
         """
-        return self._items[key]
+
+        return self.entry[key]
 
     def __setitem__(self, key, point):
         # TODO Raise Error
@@ -92,7 +165,7 @@ class Band(object):
 
     def __iter__(self):
 
-        for item in list(self._items):
+        for item in list(self._versions_[0]):
             yield item
 
         raise StopIteration
@@ -158,36 +231,25 @@ class Ring(Band):
         Band.__init__(self, *items)
 
     # replaces Band's method
-
     def _get_versions_(self):
-
         versions = []
-        for i in range(len(self._items)):
-            items = []
-            for n in range(len(self._items)):
-                item = self[n - i]
-                items.append(item)
+        for item in self.extrapolated:
 
-            versions.append(tuple(items))
+            for i in range(len(item)):
+                this = []
+                for n in range(len(item)):
+
+                    this.append(item[((n - i) % len(item))])
+
+                versions.append(tuple(this))
 
         return versions
-
 
     def __getitem__(self, key):
         """
         Modular Retrieval
         """
-        return self._items[(key % len(self))]
-
-    def cycle(self):
-        items = list(self._items)
-        if len(self) > 1:
-            items += items[:-1]
-
-        for item in items:
-            yield item
-
-        raise StopIteration
+        return self.entry[(key % len(self))]
 
 
 class Loop(Band):
@@ -195,20 +257,16 @@ class Loop(Band):
     def __init__(self, *items):
         Band.__init__(self, *items)
 
-    def _make_hash_(self):
-
-        string = self.__class__.__name__
-
-        for item in self._items:
-            string += str(hash(item))
-            
-        return hash(string)
-
-
 if __name__ == '__main__':
     pass
 
-    l = Loop('a', 'b')
-    L = Loop('b', 'a')
 
-    print(hash(l), hash(L))
+
+
+    #a = Ring('a', 'b')
+    #b = Ring('a', 'p', 'p', 'p')
+    c = Ring(Ring('n', 'o'), Ring('n', 'o'))
+
+    print(c._versions_)
+
+    #print(c in Loop('o', 'p', 'p', 'a', 'p', 'o'))
