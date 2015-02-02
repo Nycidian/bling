@@ -105,15 +105,13 @@ class Band(object):
 
         s = set()
         if self.__class__.__name__ == 'Ring':
-            print('Ring Class')
+            # Ring Class
             for item in self.extrapolated:
                 s.add(Cast(*item))
         else:
-            print('Other Class')
             for item in self.extrapolated:
                 s.add(item)
         self.extrapolated = list(s)
-        print(self.extrapolated)
 
 
     def _get_versions_(self):
@@ -257,16 +255,27 @@ class Loop(Band):
     def __init__(self, *items):
         Band.__init__(self, *items)
 
+    def shift(self, amount):
+        versions = []
+        for item in self.versions():
+            #print(item)
+            this = []
+            for i in range(len(item)):
+                #print(i, ((amount + i) % len(item)))
+                this.append(item[((amount + i ) % len(item))])
+
+            versions.append(tuple(this))
+        self._versions_ = versions
+
 if __name__ == '__main__':
     pass
 
-
-
-
     #a = Ring('a', 'b')
     #b = Ring('a', 'p', 'p', 'p')
-    c = Ring(Ring('n', 'o'), Ring('n', 'o'))
+    c = Loop( Ring('n', 'o'), Ring('a', 'p'))
 
     print(c._versions_)
+    c.shift(1)
+    print(c._versions_)
 
-    #print(c in Loop('o', 'p', 'p', 'a', 'p', 'o'))
+    #print(c in Loop('o', 'p', 'p', 'a', 'p', 'o'))7777777777
