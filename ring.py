@@ -266,16 +266,22 @@ class Loop(Band):
 
             versions.append(tuple(this))
         self._versions_ = versions
+        self._hash_ = self._make_hash_()
 
 if __name__ == '__main__':
     pass
 
     #a = Ring('a', 'b')
     #b = Ring('a', 'p', 'p', 'p')
-    c = Loop( Ring('n', 'o'), Ring('a', 'p'))
+    c = Loop(Ring('n', 'o'), Ring('a', 'p'))
+    d = Loop(Ring('a', 'p'), Ring('n', 'o'))
 
     print(c._versions_)
-    c.shift(1)
+    print(hash(c))
+    c.shift(2)
     print(c._versions_)
+    print(hash(c))
+    print(hash(d))
+
 
     #print(c in Loop('o', 'p', 'p', 'a', 'p', 'o'))7777777777
