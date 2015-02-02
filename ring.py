@@ -96,14 +96,15 @@ class Band(object):
         raise StopIteration
 
     def __contains__(self, check):
-        # TODO add function that checks if a single object is in or if a tuple of objects is contained within in order
+
+        # only one item to check
         if isinstance(check, basestring) or isinstance(check, int) or callable(check) or isinstance(check, Setting):
             for item in self:
                 if check == item:
                     return True
 
         try:
-            # see if item being checked can even fit in ring
+            # see if item being checked can even fit in instance
             self_len, check_len = len(self), len(check)
             if check_len > self_len:
                 return False
@@ -111,9 +112,13 @@ class Band(object):
             def check_multiple(in_list, in_len, r, r_len):
                 # checks tuples and lists
                 try:
-                    for i in range(r_len):
+                    """
+                    [1,2,3,4] -> [5,5,1,2,3,4]
+                    i -> [0,1,2,3]
+                    """
+                    for i in range(r_len-(in_len-1)):
                         truth = True
-                        for n in range(in_len):
+                        for n in range(0,  in_len):
                             truth = truth and (r[n+i] == in_list[n])
                         if truth:
                             return True
@@ -180,6 +185,50 @@ class Ring(Band):
 
         raise StopIteration
 
+    def __contains__(self, check):
+        """
+
+        :param check:
+        :return:
+        """
+        if isinstance(check, basestring) or isinstance(check, int) or callable(check) or isinstance(check, Setting):
+            for item in self:
+                if check == item:
+                    return True
+
+        try:
+            # see if item being checked can even fit in ring
+            self_len, check_len = len(self), len(check)
+            if check_len > self_len:
+                return False
+
+            def check_multiple(in_list, in_len, r, r_len):
+                # checks tuples and lists
+                try:
+                    for i in range(r_len):
+                        truth = True
+                        for n in range(in_len):
+                            truth = truth and (r[n+i] == in_list[n])
+                        if truth:
+                            return True
+                # should catch dictionaries types
+                #   except those that have numeric keys, start with 0 and are in order
+                except KeyError:
+                    return False
+
+            if isinstance(check, Band):
+                for lst in check.versions():
+                    _return_ = check_multiple(lst, check_len, self, self_len)
+                    if _return_ is not None:
+                        return _return_
+            else:
+                _return_ = check_multiple(check, check_len, self, self_len)
+                if _return_ is not None:
+                    return _return_
+
+        except TypeError:
+            return False
+
 
 
 
@@ -190,4 +239,18 @@ class Loop(Band):
 
 
 if __name__ == '__main__':
-    pass
+
+    a = 1
+    b = []
+
+    def func():
+        a=1
+
+    set = Setting('o', 'a')
+    ring = Ring('p', 'a')
+    loop = Loop('p', 'a')
+    ring_test = Ring('o', 'o', 'a', 'p', 'n')
+
+    print(ring in ring_test)
+    print(loop in ring_test)
+
