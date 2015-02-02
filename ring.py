@@ -37,21 +37,23 @@ class Band(object):
 
     def __init__(self, *items):
         self._items = tuple(items)
-        self._versions_ = []
+        self._versions_ = self._get_versions_()
         self._hash_ = self._make_hash_()
+
+    def _get_versions_(self):
+        return [self._items]
 
     def _make_hash_(self):
 
-        string = self.__class__.__name__
-        items = []
+        this = []
         for i in range(len(self._items)):
-            item = self[i]
-            items.append(item)
-            string += str(hash(item))
 
-        self._versions_.append(items)
+            string = self.__class__.__name__
+            for n in range(len(self._items)):
+                string += str(hash(self[((n - i) % len(self))]))
+            this.append(string)
 
-        return hash(string)
+        return hash(self.__class__.__name__ + max(this))
 
     def __hash__(self):
         return self._hash_
@@ -105,35 +107,37 @@ class Band(object):
 
         try:
             # see if item being checked can even fit in instance
-            self_len, check_len = len(self), len(check)
-            if check_len > self_len:
-                return False
+            len_check, len_self = len(check), len(self)
 
-            def check_multiple(in_list, in_len, r, r_len):
+            def check_multiple(in_list):
                 # checks tuples and lists
                 try:
-                    """
-                    [1,2,3,4] -> [5,5,1,2,3,4]
-                    i -> [0,1,2,3]
-                    """
-                    for i in range(r_len-(in_len-1)):
-                        truth = True
-                        for n in range(0,  in_len):
-                            truth = truth and (r[n+i] == in_list[n])
-                        if truth:
-                            return True
+                    if len_check > len_self:
+                        return False
+                    for version in self.versions():
+                        """
+                        [1,2,3,4] -> [5,5,1,2,3,4]
+                        i -> [0,1,2,3]
+                        """
+                        for i in range(len_self-(len_check-1)):
+                            truth = True
+                            for n in range(len_check):
+                                truth = truth and (version[n+i] == in_list[n])
+                            if truth:
+                                return True
                 # should catch dictionaries types
                 #   except those that have numeric keys, start with 0 and are in order
                 except KeyError:
                     return False
 
             if isinstance(check, Band):
-                for lst in check.versions():
-                    _return_ = check_multiple(lst, check_len, self, self_len)
+                for _list_ in check.versions():
+                    _return_ = check_multiple(_list_)
                     if _return_ is not None:
                         return _return_
             else:
-                _return_ = check_multiple(check, check_len, self, self_len)
+                print(check)
+                _return_ = check_multiple(check)
                 if _return_ is not None:
                     return _return_
 
@@ -154,21 +158,21 @@ class Ring(Band):
         Band.__init__(self, *items)
 
     # replaces Band's method
-    def _make_hash_(self):
-        this = []
+
+    def _get_versions_(self):
+
+        versions = []
         for i in range(len(self._items)):
             items = []
-            string = self.__class__.__name__
             for n in range(len(self._items)):
                 item = self[n - i]
                 items.append(item)
-                string += str(hash(item))
-            this.append(string)
-            self._versions_.append(items)
 
-        return hash(max(this))
+            versions.append(tuple(items))
 
-    # replaces Band's method
+        return versions
+
+
     def __getitem__(self, key):
         """
         Modular Retrieval
@@ -185,57 +189,26 @@ class Ring(Band):
 
         raise StopIteration
 
-    def __contains__(self, check):
-        """
-
-        :param check:
-        :return:
-        """
-        if isinstance(check, basestring) or isinstance(check, int) or callable(check) or isinstance(check, Setting):
-            for item in self:
-                if check == item:
-                    return True
-
-        try:
-            # see if item being checked can even fit in ring
-            self_len, check_len = len(self), len(check)
-            if check_len > self_len:
-                return False
-
-            def check_multiple(in_list, in_len, r, r_len):
-                # checks tuples and lists
-                try:
-                    for i in range(r_len):
-                        truth = True
-                        for n in range(in_len):
-                            truth = truth and (r[n+i] == in_list[n])
-                        if truth:
-                            return True
-                # should catch dictionaries types
-                #   except those that have numeric keys, start with 0 and are in order
-                except KeyError:
-                    return False
-
-            if isinstance(check, Band):
-                for lst in check.versions():
-                    _return_ = check_multiple(lst, check_len, self, self_len)
-                    if _return_ is not None:
-                        return _return_
-            else:
-                _return_ = check_multiple(check, check_len, self, self_len)
-                if _return_ is not None:
-                    return _return_
-
-        except TypeError:
-            return False
-
 
 class Loop(Band):
 
     def __init__(self, *items):
         Band.__init__(self, *items)
 
+    def _make_hash_(self):
+
+        string = self.__class__.__name__
+
+        for item in self._items:
+            string += str(hash(item))
+            
+        return hash(string)
+
 
 if __name__ == '__main__':
     pass
 
+    l = Loop('a', 'b')
+    L = Loop('b', 'a')
+
+    print(hash(l), hash(L))

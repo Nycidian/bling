@@ -63,7 +63,7 @@ class TestLoop(unittest.TestCase):
 
         for O in [one]:
             for F in [three, four]:
-                self.assertFalse(O == F)
+                self.assertFalse(O == F, '{} is equal to {}'.format(O, F))
 
 
     def test_in(self):
@@ -124,11 +124,11 @@ class TestRing(unittest.TestCase):
 
         for O in [one]:
             for T in [four, two]:
-                self.assertTrue(O == T)
+                self.assertTrue(O == T, '{} is not equal to {}'.format(O, T))
 
         for O in [one]:
             for F in [three]:
-                self.assertFalse(O == F)
+                self.assertFalse(O == F, '{} is equal to {}'.format(O, T))
 
 
 class TestContains(unittest.TestCase):
