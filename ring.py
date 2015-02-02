@@ -122,7 +122,7 @@ class Band(object):
                 except KeyError:
                     return False
 
-            if isinstance(check, Ring):
+            if isinstance(check, Band):
                 for lst in check.versions():
                     _return_ = check_multiple(lst, check_len, self, self_len)
                     if _return_ is not None:
@@ -190,20 +190,4 @@ class Loop(Band):
 
 
 if __name__ == '__main__':
-
-    a = 1
-    b = []
-
-    def func():
-        a=1
-
-    set = Setting('o', 'a')
-    ring = [set, 'a', set]
-    ring2 = Ring('o', 'o', 'a', 'p', 'n')
-    ring3 = Loop('o', 'o', 'a', 'p', 'n')
-
-    for i in ring3.versions():
-        print(i)
-
-    print(hash(ring2), hash(ring3))
-
+    pass
