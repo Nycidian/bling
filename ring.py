@@ -230,8 +230,6 @@ class Ring(Band):
             return False
 
 
-
-
 class Loop(Band):
 
     def __init__(self, *items):
@@ -239,18 +237,5 @@ class Loop(Band):
 
 
 if __name__ == '__main__':
-
-    a = 1
-    b = []
-
-    def func():
-        a=1
-
-    set = Setting('o', 'a')
-    ring = Ring('p', 'a')
-    loop = Loop('p', 'a')
-    ring_test = Ring('o', 'o', 'a', 'p', 'n')
-
-    print(ring in ring_test)
-    print(loop in ring_test)
+    pass
 
