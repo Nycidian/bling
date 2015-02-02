@@ -33,27 +33,28 @@ class Setting(object):
         return truth
 
 
-class Ring(object):
+class Band(object):
 
     def __init__(self, *items):
         self._items = tuple(items)
         self._versions_ = []
-
         self._hash_ = self._make_hash_()
 
     def _make_hash_(self):
-        this = []
-        for i in range(len(self._items)):
-            items = []
-            string = ''
-            for n in range(len(self._items)):
-                item = self._items[((n - i) % len(self._items))]
-                items.append(item)
-                string += str(hash(item))
-            this.append(string)
-            self._versions_.append(items)
 
-        return hash(max(this))
+        string = self.__class__.__name__
+        items = []
+        for i in range(len(self._items)):
+            item = self[i]
+            items.append(item)
+            string += str(hash(item))
+
+        self._versions_.append(items)
+
+        return hash(string)
+
+    def __hash__(self):
+        return self._hash_
 
     def __eq__(self, other):
         try:
@@ -61,11 +62,7 @@ class Ring(object):
         except TypeError:
             return False
 
-    def __hash__(self):
-        return self._hash_
-
     def __str__(self):
-
         return str(self._items)
 
     def __repr__(self):
@@ -85,7 +82,7 @@ class Ring(object):
         """
         Modular Retrieval
         """
-        return self._items[(key % len(self))]
+        return self._items[key]
 
     def __setitem__(self, key, point):
         # TODO Raise Error
@@ -94,23 +91,6 @@ class Ring(object):
     def __iter__(self):
 
         for item in list(self._items):
-            yield item
-
-        raise StopIteration
-
-    def cycle(self):
-        items = list(self._items)
-        if len(self) > 1:
-            items += items[:-1]
-
-        for item in items:
-            yield item
-
-        raise StopIteration
-
-    def versions(self):
-
-        for item in self._versions_:
             yield item
 
         raise StopIteration
@@ -155,6 +135,60 @@ class Ring(object):
         except TypeError:
             return False
 
+    def versions(self):
+
+        for item in self._versions_:
+            yield item
+
+        raise StopIteration
+
+
+class Ring(Band):
+
+    def __init__(self, *items):
+        Band.__init__(self, *items)
+
+    # replaces Band's method
+    def _make_hash_(self):
+        this = []
+        for i in range(len(self._items)):
+            items = []
+            string = self.__class__.__name__
+            for n in range(len(self._items)):
+                item = self[n - i]
+                items.append(item)
+                string += str(hash(item))
+            this.append(string)
+            self._versions_.append(items)
+
+        return hash(max(this))
+
+    # replaces Band's method
+    def __getitem__(self, key):
+        """
+        Modular Retrieval
+        """
+        return self._items[(key % len(self))]
+
+    def cycle(self):
+        items = list(self._items)
+        if len(self) > 1:
+            items += items[:-1]
+
+        for item in items:
+            yield item
+
+        raise StopIteration
+
+
+
+
+class Loop(Band):
+
+    def __init__(self, *items):
+        Band.__init__(self, *items)
+
+
 if __name__ == '__main__':
 
     a = 1
@@ -163,12 +197,13 @@ if __name__ == '__main__':
     def func():
         a=1
 
-    set = Setting('o', 'p')
+    set = Setting('o', 'a')
     ring = [set, 'a', set]
     ring2 = Ring('o', 'o', 'a', 'p', 'n')
+    ring3 = Loop('o', 'o', 'a', 'p', 'n')
 
+    for i in ring3.versions():
+        print(i)
 
-
-
-    print(set in ring2)
+    print(hash(ring2), hash(ring3))
 
