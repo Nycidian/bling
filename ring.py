@@ -70,7 +70,7 @@ class Cast(object):
         return len(self._items)
 
 
-class Band(object):
+class Wire(object):
 
     def __init__(self, *items):
         self.entry = tuple(items)
@@ -87,7 +87,7 @@ class Band(object):
             bands = 0
             for item in self.extrapolated:
                 for i in item:
-                    if isinstance(i, Band):
+                    if isinstance(i, Wire):
                         bands += 1
             if bands > 0:
                 return True
@@ -98,7 +98,7 @@ class Band(object):
             for line in self.extrapolated:
 
                 for i in range(len(line)):
-                    if isinstance(line[i], Band):
+                    if isinstance(line[i], Wire):
                         for version in line[i].versions():
                             extraps.append(tuple(list(line[:i])+list(version)+list(line[i+1:])))
             self.extrapolated = tuple(extraps)
@@ -201,7 +201,7 @@ class Band(object):
                 except KeyError:
                     return False
 
-            if isinstance(check, Band):
+            if isinstance(check, Wire):
                 for _list_ in check.versions():
                     _return_ = check_multiple(_list_)
                     if _return_ is not None:
@@ -223,12 +223,12 @@ class Band(object):
         raise StopIteration
 
 
-class Ring(Band):
+class Ring(Wire):
 
     def __init__(self, *items):
-        Band.__init__(self, *items)
+        Wire.__init__(self, *items)
 
-    # replaces Band's method
+    # replaces Wire's method
     def _get_versions_(self):
         versions = []
         for item in self.extrapolated:
@@ -250,10 +250,10 @@ class Ring(Band):
         return self.entry[(key % len(self))]
 
 
-class Loop(Band):
+class Chain(Wire):
 
     def __init__(self, *items):
-        Band.__init__(self, *items)
+        Wire.__init__(self, *items)
 
     def shift(self, amount):
         versions = []
@@ -274,8 +274,8 @@ if __name__ == '__main__':
 
     #a = Ring('a', 'b')
     #b = Ring('a', 'p', 'p', 'p')
-    c = Loop(Ring('n', 'o'), Ring('a', 'p'))
-    d = Loop(Ring('n', 'o'), Ring('a', 'p'))
+    c = Chain(Ring('n', 'o'), Ring('a', 'p'))
+    d = Chain(Ring('n', 'o'), Ring('a', 'p'))
 
     print(c._versions_)
     print(hash(c))
@@ -283,9 +283,9 @@ if __name__ == '__main__':
     c.shift(1)
     print(c._versions_)
     print(hash(c))
-    l = Loop(Ring('n', 'o'), Ring('a', 'p')).shift(1)
+    l = Chain(Ring('n', 'o'), Ring('a', 'p')).shift(1)
     print(l._versions_)
 
 
 
-    #print(c in Loop('o', 'p', 'p', 'a', 'p', 'o'))7777777777
+    #print(c in Chain('o', 'p', 'p', 'a', 'p', 'o'))
