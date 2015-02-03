@@ -218,10 +218,10 @@ class Wire(object):
 
     def out_of(self, other):
 
-        # only one item to check
+        # only one item to check, make sure this class len is 1
         if isinstance(other, basestring) or isinstance(other, int) or callable(other) or isinstance(other, Charm):
-            for item in self:
-                if other == item:
+            if len(self) == 1:
+                if other == self[0]:
                     return True
 
         try:
