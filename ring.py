@@ -207,7 +207,6 @@ class Wire(object):
                     if _return_ is not None:
                         return _return_
             else:
-                print(check)
                 _return_ = check_multiple(check)
                 if _return_ is not None:
                     return _return_
@@ -262,7 +261,7 @@ class Chain(Wire):
             this = []
             for i in range(len(item)):
                 #print(i, ((amount + i) % len(item)))
-                this.append(item[((amount + i ) % len(item))])
+                this.append(item[((i - amount) % len(item))])
 
             versions.append(tuple(this))
         self._versions_ = versions
@@ -274,17 +273,17 @@ if __name__ == '__main__':
 
     #a = Ring('a', 'b')
     #b = Ring('a', 'p', 'p', 'p')
-    c = Chain(Ring('n', 'o'), Ring('a', 'p'))
-    d = Chain(Ring('n', 'o'), Ring('a', 'p'))
+    c = Chain(Ring('n', 'o'), Ring('a', 'p', 'a'))
+    d = Chain(Ring('n', 'o'), Ring('a', 'p', 'a'))
 
     print(c._versions_)
     print(hash(c))
     print(c == d)
-    c.shift(1)
+    c.shift(-1)
     print(c._versions_)
-    print(hash(c))
-    l = Chain(Ring('n', 'o'), Ring('a', 'p')).shift(1)
-    print(l._versions_)
+    #print(hash(c))
+    #l = Chain(Ring('n', 'o'), Ring('a', 'p')).shift(1)
+    #print(l._versions_)
 
 
 
