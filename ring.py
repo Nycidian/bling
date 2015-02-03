@@ -168,31 +168,31 @@ class Wire(object):
 
         raise StopIteration
 
-    def __contains__(self, check):
+    def __contains__(self, other):
 
         # only one item to check
-        if isinstance(check, basestring) or isinstance(check, int) or callable(check) or isinstance(check, Charm):
+        if isinstance(other, basestring) or isinstance(other, int) or callable(other) or isinstance(other, Charm):
             for item in self:
-                if check == item:
+                if other == item:
                     return True
 
         try:
             # see if item being checked can even fit in instance
-            len_check, len_self = len(check), len(self)
+            len_other, len_self = len(other), len(self)
 
             def check_multiple(in_list):
                 # checks tuples and lists
                 try:
-                    if len_check > len_self:
+                    if len_other > len_self:
                         return False
                     for version in self.versions():
                         """
                         [1,2,3,4] -> [5,5,1,2,3,4]
                         i -> [0,1,2,3]
                         """
-                        for i in range(len_self-(len_check-1)):
+                        for i in range(len_self-(len_other-1)):
                             truth = True
-                            for n in range(len_check):
+                            for n in range(len_other):
                                 truth = truth and (version[n+i] == in_list[n])
                             if truth:
                                 return True
@@ -201,18 +201,71 @@ class Wire(object):
                 except KeyError:
                     return False
 
-            if isinstance(check, Wire):
-                for _list_ in check.versions():
+            if isinstance(other, Wire):
+                for _list_ in other.versions():
                     _return_ = check_multiple(_list_)
-                    if _return_ is not None:
+                    if _return_:
                         return _return_
             else:
-                _return_ = check_multiple(check)
-                if _return_ is not None:
+                _return_ = check_multiple(other)
+                if _return_:
                     return _return_
 
         except TypeError:
             return False
+
+        return False
+
+    def out_of(self, other):
+
+        # only one item to check
+        if isinstance(other, basestring) or isinstance(other, int) or callable(other) or isinstance(other, Charm):
+            for item in self:
+                if other == item:
+                    return True
+
+        try:
+            len_other, len_self = len(other), len(self)
+            # see if item being checked can even fit in instance
+            if len_other < len_self:
+                return False
+
+            def check_multiple(in_list):
+                # checks tuples and lists
+                try:
+                    for version in self.versions():
+                        """
+                        [1,2,3,4] -> [5,5,1,2,3,4]
+                        i -> [0,1,2,3]
+                        """
+                        for i in range(len_other-(len_self-1)):
+                            truth = True
+                            for n in range(len_self):
+                                truth = truth and (version[n] == in_list[n+i])
+                            if truth:
+                                return True
+
+                # should catch dictionaries types
+                #   except those that have numeric keys, start with 0 and are in order
+                except KeyError:
+                    return False
+
+            if isinstance(other, Wire):
+
+                for item in other.versions():
+                    _return_ = check_multiple(item)
+                    if _return_:
+                        return _return_
+            else:
+                print('2')
+                _return_ = check_multiple(other)
+                if _return_:
+                    return _return_
+
+        except TypeError:
+            return False
+
+        return False
 
     def versions(self):
 
@@ -227,7 +280,6 @@ class Ring(Wire):
     def __init__(self, *items):
         Wire.__init__(self, *items)
 
-    # replaces Wire's method
     def _get_versions_(self):
         versions = []
         for item in self.extrapolated:
@@ -257,10 +309,8 @@ class Chain(Wire):
     def shift(self, amount):
         versions = []
         for item in self.versions():
-            #print(item)
             this = []
             for i in range(len(item)):
-                #print(i, ((amount + i) % len(item)))
                 this.append(item[((i - amount) % len(item))])
 
             versions.append(tuple(this))
@@ -271,20 +321,14 @@ class Chain(Wire):
 if __name__ == '__main__':
     pass
 
-    #a = Ring('a', 'b')
-    #b = Ring('a', 'p', 'p', 'p')
-    c = Chain(Ring('n', 'o'), Ring('a', 'p', 'a'))
+    a = Ring('a', 'p')
+    b = Ring('a', 'p', 'p', 'p')
+    c = Chain(Ring('a', 'o'), Ring('p', 'p', 'p'))
     d = Chain(Ring('n', 'o'), Ring('a', 'p', 'a'))
 
+    print(a.out_of(c))
+
+    print(b.out_of(c))
+
+    print(b._versions_)
     print(c._versions_)
-    print(hash(c))
-    print(c == d)
-    c.shift(-1)
-    print(c._versions_)
-    #print(hash(c))
-    #l = Chain(Ring('n', 'o'), Ring('a', 'p')).shift(1)
-    #print(l._versions_)
-
-
-
-    #print(c in Chain('o', 'p', 'p', 'a', 'p', 'o'))
