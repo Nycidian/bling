@@ -2,14 +2,28 @@ __author__ = 'Nycidian'
 
 import unittest
 
-from ring import Ring, Chain, Setting, Wire
+from ring import Ring, Chain, Charm, Wire, Cast
 
 
 def alpha():
     pass
 
 
-class TestLoop(unittest.TestCase):
+class TestCast(unittest.TestCase):
+
+    def test(self):
+        """
+        Test basic functionality of Ring is identical in Cast
+        """
+        cast = Cast(0, 'hello', alpha)
+        cast2 = Cast('hello', alpha, 0)
+        self.assertEqual(cast[1], 'hello')
+        self.assertEqual(cast[0], 0)
+        self.assertEqual(cast[2], alpha)
+        self.assertEqual(cast, cast2)
+
+
+class TestChain(unittest.TestCase):
 
     def test_get(self):
         loop = Chain(0, 'hello', alpha)
@@ -161,6 +175,15 @@ class TestContains(unittest.TestCase):
         true_in(Ring(*pa), loop_test)
         false_in(no, loop_test)
 
+
+class TestFlattening(unittest.TestCase):
+
+    def test(self):
+        ring1 = Ring('y', 'n')
+        ring2 = Ring('|', ring1)
+        chain = Chain(7, ring2)
+        
+        self.assertTrue(len([n for n in chain.versions()]) == 6)
 
 if __name__ == '__main__':
 
