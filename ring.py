@@ -7,7 +7,7 @@ except NameError:
     basestring = str
 
 
-class Setting(object):
+class Charm(object):
     """
     Container that evaluates to true if any one of the contents is equal to what it's tested against
     """
@@ -171,7 +171,7 @@ class Wire(object):
     def __contains__(self, check):
 
         # only one item to check
-        if isinstance(check, basestring) or isinstance(check, int) or callable(check) or isinstance(check, Setting):
+        if isinstance(check, basestring) or isinstance(check, int) or callable(check) or isinstance(check, Charm):
             for item in self:
                 if check == item:
                     return True
