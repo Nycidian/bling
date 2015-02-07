@@ -81,7 +81,7 @@ class TestChain(unittest.TestCase):
 
 
     def test_in(self):
-        loop_true = ['a', 'p']
+        loop_true = Ring('a', 'p')
         loop_false = ['p', 'a']
 
         loop_test = Chain('o', 'o', 'a', 'p', 'n')
@@ -178,13 +178,16 @@ class TestContains(unittest.TestCase):
 
 class TestFlattening(unittest.TestCase):
 
-    def test(self):
+    """
+
+    def test_(self):
         ring1 = Ring('y', 'n')
         ring2 = Ring('|', ring1)
         chain = Chain(7, ring2)
-        
+
         self.assertTrue(len([n for n in chain.versions()]) == 6)
+    """
+    def test_extrapolate(self):
+        ring = Ring('a')
 
-if __name__ == '__main__':
-
-    unittest.main()
+        ring

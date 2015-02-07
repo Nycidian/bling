@@ -33,6 +33,7 @@ class Charm(object):
         return truth
 
 
+
 class Cast(object):
 
     def __init__(self, *items):
@@ -61,10 +62,10 @@ class Cast(object):
         return self._items[(key % len(self))]
 
     def __str__(self):
-        return str(self._items)
+        return '{}{}'.format(self.__class__.__name__, self._items)
 
     def __repr__(self):
-        return str(self._items)
+        return '{}{}'.format(self.__class__.__name__, self._items)
 
     def __len__(self):
         return len(self._items)
@@ -74,53 +75,59 @@ class Wire(object):
 
     def __init__(self, *items):
         self.entry = tuple(items)
-        self.extrapolated = [tuple(items)]
-        self._extrapolate_()
-        self._versions_ = self._get_versions_()
+        self.extrapolated = self._extrapolate_([items])
+        self.versions = self._get_versions_()
         self._hash_ = self._make_hash_()
 
-    def _extrapolate_(self):
-
-        def banded():
-            if len(self.extrapolated) == 0:
-                return False
-            bands = 0
-            for item in self.extrapolated:
-                for i in item:
-                    if isinstance(i, Wire):
-                        bands += 1
-            if bands > 0:
-                return True
+    @staticmethod
+    def wired(this):
+        """
+        :param this: list of iterable objects
+        :return: Returns True if any return of an iterable is a Wire class
+        """
+        if len(this) == 0:
             return False
+        for item in this:
+            for i in item:
+                if isinstance(i, Wire):
+                    return True
+        return False
 
-        while banded():
-            extraps = []
-            for line in self.extrapolated:
+    def _extrapolate_(self, object_instance):
+        _return_ = []
+        while len(object_instance) > 0:
+            work = object_instance.pop()
+            end = len(work)
+            for n in range(end):
+                if isinstance(work[n], Wire):
 
-                for i in range(len(line)):
-                    if isinstance(line[i], Wire):
-                        for version in line[i].versions():
-                            extraps.append(tuple(list(line[:i])+list(version)+list(line[i+1:])))
-            self.extrapolated = tuple(extraps)
+                    for version in work[n].versions:
+                        object_instance.append(
+                            list(work[:n]) + list(version) + list(work[n+1:]))
+                    break
+                if n == (end - 1):
+                    _return_.append(work)
 
-        s = set()
+        non_duplicate = set()
         if self.__class__.__name__ == 'Ring':
             # Ring Class
-            for item in self.extrapolated:
-                s.add(Cast(*item))
+            for item in _return_:
+                non_duplicate.add(Cast(*item))
         else:
-            for item in self.extrapolated:
-                s.add(item)
-        self.extrapolated = list(s)
+            for item in _return_:
+                non_duplicate.add(tuple(item))
+        _return_ = list(non_duplicate)
+
+        return _return_
 
 
     def _get_versions_(self):
         return self.extrapolated
 
     def _make_hash_(self):
-
+        print(self.versions)
         this = []
-        for version in self._versions_:
+        for version in self.versions:
             this.append(hash(version))
 
         return hash(self.__class__.__name__ + str(max(this)))
@@ -135,10 +142,10 @@ class Wire(object):
             return False
 
     def __str__(self):
-        return str(self.entry)
+        return '{}({})'.format(self.__class__.__name__, self.entry)
 
     def __repr__(self):
-        return str(self.entry)
+        return '{}{}'.format(self.__class__.__name__, self.entry)
 
     @staticmethod
     def __bool__():
@@ -148,7 +155,7 @@ class Wire(object):
         return type(self).__bool__(self)
 
     def __len__(self):
-        return len(self._versions_[0])
+        return len(self.versions[0])
 
     def __getitem__(self, key):
         """
@@ -163,7 +170,7 @@ class Wire(object):
 
     def __iter__(self):
 
-        for item in list(self._versions_[0]):
+        for item in list(self.versions[0]):
             yield item
 
         raise StopIteration
@@ -179,13 +186,12 @@ class Wire(object):
         try:
             # see if item being checked can even fit in instance
             len_other, len_self = len(other), len(self)
-
             def check_multiple(in_list):
                 # checks tuples and lists
                 try:
                     if len_other > len_self:
                         return False
-                    for version in self.versions():
+                    for version in self.versions:
                         """
                         [1,2,3,4] -> [5,5,1,2,3,4]
                         i -> [0,1,2,3]
@@ -202,7 +208,7 @@ class Wire(object):
                     return False
 
             if isinstance(other, Wire):
-                for _list_ in other.versions():
+                for _list_ in other.versions:
                     _return_ = check_multiple(_list_)
                     if _return_:
                         return _return_
@@ -233,7 +239,7 @@ class Wire(object):
             def check_multiple(in_list):
                 # checks tuples and lists
                 try:
-                    for version in self.versions():
+                    for version in self.versions:
                         """
                         [1,2,3,4] -> [5,5,1,2,3,4]
                         i -> [0,1,2,3]
@@ -251,13 +257,11 @@ class Wire(object):
                     return False
 
             if isinstance(other, Wire):
-
-                for item in other.versions():
+                for item in other.versions:
                     _return_ = check_multiple(item)
                     if _return_:
                         return _return_
             else:
-                print('2')
                 _return_ = check_multiple(other)
                 if _return_:
                     return _return_
@@ -269,7 +273,7 @@ class Wire(object):
 
     def versions(self):
 
-        for item in self._versions_:
+        for item in self.versions:
             yield item
 
         raise StopIteration
@@ -308,27 +312,47 @@ class Chain(Wire):
 
     def shift(self, amount):
         versions = []
-        for item in self.versions():
+        for item in self.versions:
             this = []
             for i in range(len(item)):
                 this.append(item[((i - amount) % len(item))])
 
             versions.append(tuple(this))
-        self._versions_ = versions
+        self.versions = versions
         self._hash_ = self._make_hash_()
         return self
 
+
+class Locket(Wire):
+    """
+    Container that hold multiple objects but only return one instance at a time
+    """
+
+    def __init__(self, *items):
+        self.entry = tuple(items)
+        self.extrapolated = self._extrapolate_([[t] for t in items])
+        self.versions = self._get_versions_()
+        self._hash_ = self._make_hash_()
+
+    def shift(self, amount):
+        versions = []
+        for item in self.versions:
+            this = []
+            for i in range(len(item)):
+                this.append(item[((i - amount) % len(item))])
+
+            versions.append(tuple(this))
+        self.versions = versions
+        self._hash_ = self._make_hash_()
+        return self
+
+
 if __name__ == '__main__':
-    pass
 
-    a = Ring('a', 'p')
-    b = Ring('a', 'p', 'p', 'p')
-    c = Chain(Ring('a', 'o'), Ring('p', 'p', 'p'))
-    d = Chain(Ring('n', 'o'), Ring('a', 'p', 'a'))
 
-    print(a.out_of(c))
+    loop_true = ['a', 'p']
+    loop_false = ['p', 'a']
 
-    print(b.out_of(c))
+    loop_test = Chain('o', 'o', 'a', 'p', 'n')
 
-    print(b._versions_)
-    print(c._versions_)
+    print(loop_true in loop_test)
