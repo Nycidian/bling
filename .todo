@@ -1,0 +1,5 @@
+TODO: Add a None check to flattening to allow removing None list object
+TODO: Add an object (Gem?) that will effect how the match works so that it can encompass multiple instances
+TODO: Change Charm so that it is a negative match with a 0 len match matching all.
+
+

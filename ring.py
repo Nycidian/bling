@@ -33,7 +33,6 @@ class Charm(object):
         return truth
 
 
-
 class Cast(object):
 
     def __init__(self, *items):
@@ -349,10 +348,11 @@ class Locket(Wire):
 
 if __name__ == '__main__':
 
+    a = Locket('http://www.','https://www.')
+    b = Locket('google', 'yahoo', 'duckduckgo')
+    c = Locket('.com', '.co', '.in')
+    loop_test = Chain(a,b,c)
 
-    loop_true = ['a', 'p']
-    loop_false = ['p', 'a']
-
-    loop_test = Chain('o', 'o', 'a', 'p', 'n')
-
-    print(loop_true in loop_test)
+    #print(loop_test.versions)
+    for t in loop_test.versions:
+        print(''.join(t))
