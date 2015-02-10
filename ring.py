@@ -6,11 +6,11 @@ try:
 except NameError:
     basestring = str
 
-
+    """
 class Charm(object):
-    """
+    '''
     Container that evaluates to true if any one of the contents is equal to what it's tested against
-    """
+    '''
 
     def __init__(self, *items):
         self._items = tuple(items)
@@ -54,9 +54,6 @@ class Cast(object):
         return hash(max(this))
 
     def __getitem__(self, key):
-        """
-        Modular Retrieval
-        """
 
         return self._items[(key % len(self))]
 
@@ -69,6 +66,7 @@ class Cast(object):
     def __len__(self):
         return len(self._items)
 
+    """
 
 class Wire(object):
 

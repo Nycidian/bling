@@ -1,5 +1,9 @@
+TODO: Refactor all classes!
+
+    TODO: Add shape to hash, make hash independent of versions and remove class from hash
+    TODO: Add caps? as an object |implementing old shifting method in new fashion|
+    TODO: implement get
+
 TODO: Add a None check to flattening to allow removing None list object
 TODO: Add an object (Gem?) that will effect how the match works so that it can encompass multiple instances
 TODO: Change Charm so that it is a negative match with a 0 len match matching all.
-
-
