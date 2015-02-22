@@ -1,19 +1,16 @@
 from bling import Ring, Chain, Clasp, Gem
 
 
-test_1 = 'b', 'c'
+test_1 = 'a', 'b', 'c'
 test_2 = 'd', '|', 0
 class_1 = Gem(*test_1)
-class_2 = Ring('a', class_1)
-class_3 = Chain('d', class_2)
+class_2 = Ring('|', class_1)
+class_3 = Ring('|', class_2)
+class_4 = Chain('|', '-')
 
-print(class_3)
 
-print(hash('a'))
-print(hash('b'))
-print(hash('c'))
-print(hash('d'))
+print(class_4.out_of('||||-|||'))
 
-print(max([hash('a'), hash('b'), hash('c'), hash('d')]))
 
-print(hash(frozenset(['dabc', 'dcba'])))
+
+

@@ -10,5 +10,6 @@ class Ring(Iterable, Band):
         Iterable.__init__(self, *items)
         Band.__init__(self)
 
-        self._make_versions_()
-        self._make_hash_()
+        self.cyclic = True
+        self.make_iterable()
+

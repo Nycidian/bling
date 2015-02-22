@@ -17,6 +17,6 @@ class Band(object):
 
                 this.append(self._entries_[((n - i) % this_len)])
 
-            versions.append(tuple(this))
+            yield tuple(this)
 
-        return versions
+        raise StopIteration

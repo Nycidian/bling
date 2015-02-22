@@ -2,9 +2,9 @@ __author__ = 'Nycidian'
 
 import unittest
 
-from forge.ring import Ring
-from forge.chain import Chain
-from gem import Gem
+from bling import Ring
+from bling import Chain
+from bling import Gem
 
 
 class TestGem(unittest.TestCase):

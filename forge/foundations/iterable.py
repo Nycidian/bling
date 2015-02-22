@@ -1,6 +1,7 @@
 __author__ = 'Nycidian'
 
-from math import fabs
+from congruence import Congruence
+congruence_hash = Congruence().make_congruence_set
 
 
 class Iterable(object):
@@ -10,53 +11,51 @@ class Iterable(object):
 
     def __init__(self, *items):
         self._entries_ = items
-        self._hash_value_ = None
+
         self._versions_ = None
-        self._hash_versions_ = None
+        self._hash_object_ = None
+
+        self.cyclic = False
+        self.reflect = False
 
         self.foundation = 'Iterable'
 
+    def make_iterable(self):
+        self._make_hash_()
+        self._make_versions_()
 
     def _make_versions_(self):
-        """
-        Checks if _versions_ has been computed
-            if not does so with a custom function if it exists or stores default.
-        """
+
         if self._versions_ is None:
+            self._versions_ = self._get_versions_
 
-            try:
-                self._versions_ = self._get_versions_()
-            except AttributeError:
-                self._versions_ = [self._entries_]
-
+        """
         if self._hash_versions_ is None:
 
             try:
                 self._hash_versions_ = self._get_hash_versions_()
             except AttributeError:
                 self._hash_versions_ = self._versions_
+        """
 
     def _make_hash_(self):
 
-        this = []
-        for version in self._hash_versions_:
-            this.append(hash(version))
-
-        self._hash_value_ = str(hash(self.shape)) + str(int(fabs(max(this))))
+        self._hash_object_ = tuple([self.shape, congruence_hash(self._entries_, cyclic=self.cyclic, reflect=self.reflect)])
 
     def __hash__(self):
         """
-        Checks if hash has been computed and stored in _hash_value_
+        Checks if hash has been computed and stored in _hash_object_
             if not stores default hash.
         Returns that stored hash.
         """
 
-        return int(self._hash_value_)
+        return hash(self._hash_object_)
 
     def __eq__(self, other):
+
         try:
-            return hash(self) == hash(other)
-        except TypeError:
+            return self._hash_object_ == other._hash_object_
+        except AttributeError:
             return False
 
     def _get_modular_entry_(self, key):
@@ -78,12 +77,12 @@ class Iterable(object):
     def out_of(self, other):
 
         for place in range(len(other)):
+
             truth = False
             fragment = other[place:]
 
-            for version in self._versions_:
-                print('out_of version', version)
-                print('out_of fragment', fragment)
+            for version in self._versions_():
+
                 for index in range(len(version)):
                     this = None
                     try:
@@ -91,13 +90,12 @@ class Iterable(object):
                     except AttributeError:
                         if version[index] == fragment[0]:
                             this = fragment[1:]
-                    print('out_of this', this)
+
                     if this:
                         truth = True
                         fragment = this
                     else:
                         truth = False
-                        print('out_of break')
                         break
 
                 if truth:
@@ -107,20 +105,19 @@ class Iterable(object):
 
     def front_of(self, other):
 
-        for version in self._versions_:
+        for version in self._versions_():
             truth = True
             fragment = other
-            print('front_of version', version)
-            print('front_of fragment', fragment)
+
             for index in range(len(version)):
-                print('front_of index', version[index])
+
                 this = None
                 try:
                     this = version[index].front_of(fragment)
                 except AttributeError:
                     if version[index] == fragment[0]:
                         this = fragment[1:]
-                print('front_of this', this)
+
                 if this:
                     fragment = this
                 else:

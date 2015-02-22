@@ -57,7 +57,7 @@ class Temporal(object):
 
     def __hash__(self):
         """
-        Checks if hash has been computed and stored in _hash_value_
+        Checks if hash has been computed and stored in _hash_object_
             if not stores default hash.
         Returns that stored hash.
         """

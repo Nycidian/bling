@@ -10,6 +10,5 @@ class Gem(Iterable, Faceted):
         Iterable.__init__(self, *items)
         Faceted.__init__(self)
 
-        self._make_versions_()
-        self._make_hash_()
+        self.make_iterable()
 
