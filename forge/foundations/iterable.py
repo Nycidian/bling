@@ -29,15 +29,6 @@ class Iterable(object):
         if self._versions_ is None:
             self._versions_ = self._get_versions_
 
-        """
-        if self._hash_versions_ is None:
-
-            try:
-                self._hash_versions_ = self._get_hash_versions_()
-            except AttributeError:
-                self._hash_versions_ = self._versions_
-        """
-
     def _make_hash_(self):
 
         self._hash_object_ = tuple([self.shape, congruence_hash(self._entries_, cyclic=self.cyclic, reflect=self.reflect)])
