@@ -1,16 +1,15 @@
 __author__ = 'Nycidian'
 
-from forge.tool.cast import Cast
+from forge.foundations.iterable import Iterable
 from forge.shapes.faceted import Faceted
 
 
-class Gem(Cast, Faceted):
+class Gem(Iterable, Faceted):
 
     def __init__(self, *items):
-        Cast.__init__(self)
+        Iterable.__init__(self, *items)
         Faceted.__init__(self)
 
-        self._entries_ = items
         self._make_versions_()
-
+        self._make_hash_()
 

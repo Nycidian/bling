@@ -4,7 +4,7 @@ import unittest
 
 from forge.ring import Ring
 from forge.chain import Chain
-from forge.gem import Gem
+from gem import Gem
 
 
 class TestGem(unittest.TestCase):

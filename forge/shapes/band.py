@@ -3,21 +3,20 @@ __author__ = 'Nycidian'
 
 class Band(object):
     """
-    Cyclic Method
+    Cyclic
     """
     def __init__(self):
-        pass
+        self.shape = 'Band'
 
     def _get_versions_(self):
         versions = []
-        for item in self._versions_:
+        this_len = len(self._entries_)
+        for i in range(this_len):
+            this = []
+            for n in range(this_len):
 
-            for i in range(len(item)):
-                this = []
-                for n in range(len(item)):
+                this.append(self._entries_[((n - i) % this_len)])
 
-                    this.append(item[((n - i) % len(item))])
-
-                versions.append(tuple(this))
+            versions.append(tuple(this))
 
         return versions
